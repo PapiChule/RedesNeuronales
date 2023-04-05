@@ -1,0 +1,189 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNQKBlCYa5AQlz8Reh+moaa"
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "YAi7fe13XEq0",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "4bc0243b-9416-4be9-8fc5-79aa31aac06d"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Writing perceptron.c\n"
+          ]
+        }
+      ],
+      "source": [
+        "%%writefile perceptron.c\n",
+        "\n",
+        "#include <stdio.h>\n",
+        "#include <stdlib.h>\n",
+        "\n",
+        "#define TRUE 1\n",
+        "#define FALSE 0\n",
+        "\n",
+        "float *calculoPatrones(int patrones[][2], float pesos[], float bias);\n",
+        "int *evaluarPatrones(float *total);\n",
+        "int *calcularErrores(int *valores, int *salida);\n",
+        "\n",
+        "int main(void){\n",
+        "  \n",
+        "  // Crear patrones\n",
+        "  int patrones[4][2] = {{0,0}, {0,1}, {1,0}, {1,1}};\n",
+        "\n",
+        "  // Crear valores de salida deseados\n",
+        "  int salida[4] = {0, 0, 0, 1};\n",
+        "\n",
+        "  // Definir pesos e inicializar vector de pesos\n",
+        "  float pesos[2] = {1.0, 0.0};\n",
+        "  float bias = -0.5;\n",
+        "\n",
+        "  // Calcular patrones\n",
+        "  float *total = calculoPatrones(patrones, pesos, bias); \n",
+        "\n",
+        "  // Evaluar función\n",
+        "  int *valores = evaluarPatrones(total);\n",
+        "\n",
+        "  // Evaluar función y retornar errores\n",
+        "  int *errores = calcularErrores(valores, salida);\n",
+        "\n",
+        "}\n",
+        "\n",
+        "float *calculoPatrones(int patrones[][2], float *pesos, float bias) {\n",
+        "  \n",
+        "  int i, j;\n",
+        "  float *suma = (float *)malloc(sizeof(float) * 4);\n",
+        "\n",
+        "  for(i = 0; i < 4; i++){\n",
+        "    for(j = 0; j < 2; j++){\n",
+        "      // Calcular suma total de patrones ponderados con los pesos y bias\n",
+        "      suma[i] += pesos[j] * patrones[i][j];\n",
+        "    }\n",
+        "    suma[i] += bias;\n",
+        "  }\n",
+        "\n",
+        "  return suma;\n",
+        "\n",
+        "}\n",
+        "\n",
+        "int *evaluarPatrones(float *total) {\n",
+        "\n",
+        "  int i;\n",
+        "  int *evaluados = (int *)malloc(sizeof(int) * 4);\n",
+        "\n",
+        "  for(i = 0; i < 4; i++){\n",
+        "    // Evaluamos funcion H(x)\n",
+        "    if(total[i] < 0){\n",
+        "      evaluados[i] = FALSE;\n",
+        "    }else{\n",
+        "      evaluados[i] = TRUE;\n",
+        "    }\n",
+        "  }\n",
+        "\n",
+        "  return evaluados;\n",
+        "\n",
+        "}\n",
+        "\n",
+        "int *calcularErrores(int *total, int *salida) {\n",
+        "\n",
+        "  int i;\n",
+        "  int *errores = (int *)malloc(sizeof(int) * 4);\n",
+        "\n",
+        "  for(i = 0; i < 4; i++){\n",
+        "    errores[i] = salida[i] - total[i];\n",
+        "    printf(\"%d\\n\", errores[i]);\n",
+        "  }\n",
+        "\n",
+        "  return errores;\n",
+        "\n",
+        "}"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!ls -l"
+      ],
+      "metadata": {
+        "id": "3WPm2vTgYC20",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "a06bd553-245c-4ba4-861c-8ae421a546e4"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "total 36\n",
+            "-rw-r--r-- 1 root root  1503 Apr  4 03:23 epoch.c\n",
+            "-rw-r--r-- 1 root root  1503 Apr  4 03:21 neurona.c\n",
+            "-rwxr-xr-x 1 root root 16920 Apr  4 03:21 output\n",
+            "-rw-r--r-- 1 root root  1503 Apr  4 03:23 perceptron.c\n",
+            "drwxr-xr-x 1 root root  4096 Mar 31 13:36 sample_data\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "%%shell\n",
+        "\n",
+        "gcc epoch.c -o output\n",
+        "./output"
+      ],
+      "metadata": {
+        "id": "hbAwPbrlYVkF",
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "outputId": "41e76051-fef8-40cc-e0f4-492b2ac5e586"
+      },
+      "execution_count": null,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "0\n",
+            "0\n",
+            "-1\n",
+            "0\n"
+          ]
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": []
+          },
+          "metadata": {},
+          "execution_count": 136
+        }
+      ]
+    }
+  ]
+}
